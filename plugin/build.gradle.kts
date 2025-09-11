@@ -6,10 +6,10 @@ plugins {
 }
 
 // TODO: Update value to your plugin's name.
-val pluginName = "GodotAndroidPluginTemplate"
+val pluginName = "NotificationHandler"
 
 // TODO: Update value to match your plugin's package name.
-val pluginPackageName = "org.godotengine.plugin.android.template"
+val pluginPackageName = "org.godotengine.plugin.android.notifications"
 
 android {
     namespace = pluginPackageName
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
 
         manifestPlaceholders["godotPluginName"] = pluginName
         manifestPlaceholders["godotPluginPackageName"] = pluginPackageName

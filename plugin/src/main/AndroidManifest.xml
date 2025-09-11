@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application>
         <!--
         Plugin metadata:
@@ -14,8 +14,8 @@
         initializer.
         -->
         <meta-data
-            android:name="org.godotengine.plugin.v2.${godotPluginName}"
-            android:value="${godotPluginPackageName}.GodotAndroidPlugin"/>
+            android:name="org.godotengine.plugin.v2.NotificationHandler"
+            android:value="org.godotengine.plugin.android.notifications.NotificationHandler"/>
     </application>
 
 </manifest>
