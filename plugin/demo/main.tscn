@@ -1,19 +1,76 @@
-[gd_scene load_steps=2 format=3 uid="uid://cg3hylang5fxn"]
+[gd_scene load_steps=3 format=3 uid="uid://b1xcw1ho7qdy8"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_j0gfq"]
+[ext_resource type="Script" uid="uid://b57002m46rheh" path="res://main.gd" id="1_ig7tw"]
 
-[node name="Main" type="Node2D"]
-script = ExtResource("1_j0gfq")
+[sub_resource type="LabelSettings" id="LabelSettings_ig7tw"]
+font_size = 30
+font_color = Color(0, 0, 0, 1)
 
-[node name="Button" type="Button" parent="."]
-anchors_preset = 14
-anchor_top = 0.5
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = 40.0
-offset_top = 250.0
-offset_right = 320.0
-offset_bottom = 312.0
-text = "Hello World"
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ig7tw")
 
-[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_right = 649.0
+offset_bottom = 1152.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "Notification Handler"
+label_settings = SubResource("LabelSettings_ig7tw")
+horizontal_alignment = 1
+
+[node name="HelloMargin" type="MarginContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="Hello" type="Button" parent="ScrollContainer/VBoxContainer/HelloMargin"]
+layout_mode = 2
+text = "Hello Wordl
+"
+
+[node name="BuildMargin" type="MarginContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="Build" type="Button" parent="ScrollContainer/VBoxContainer/BuildMargin"]
+layout_mode = 2
+text = "Build"
+
+[node name="SimpleMargin" type="MarginContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="Simple" type="Button" parent="ScrollContainer/VBoxContainer/SimpleMargin"]
+layout_mode = 2
+text = "Send simple notification"
+
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/HelloMargin/Hello" to="." method="_on_hello_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/BuildMargin/Build" to="." method="_on_build_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/SimpleMargin/Simple" to="." method="_on_simple_pressed"]

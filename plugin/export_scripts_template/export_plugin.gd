@@ -34,9 +34,9 @@ class AndroidExportPlugin extends EditorExportPlugin:
 	func _get_android_dependencies(platform, debug):
 		# TODO: Add remote dependices here.
 		if debug:
-			return PackedStringArray([])
+			return PackedStringArray(["com.caverock:androidsvg:1.4"])
 		else:
-			return PackedStringArray([])
+			return PackedStringArray(["com.caverock:androidsvg:1.4"])
 
 	func _get_name():
 		return _plugin_name
