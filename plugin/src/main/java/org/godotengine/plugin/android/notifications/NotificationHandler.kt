@@ -6,6 +6,8 @@ import org.json.JSONArray
 import android.widget.Toast
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Build
+import androidx.annotation.RequiresApi
 
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -15,10 +17,18 @@ import androidx.core.graphics.drawable.IconCompat
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.UsedByGodot
+import org.godotengine.plugin.android.notifications.utils.Logger
 import org.godotengine.plugin.android.notifications.utils.ResourceLoader
+
 
 class NotificationHandler(godot: Godot): GodotPlugin(godot) {
     private var initialized: Boolean = false
+
+    companion object {
+        const val ERROR_RETURN: Int = -1
+        const val REQUEST_CODE_NOTIFICATIONS: Int = 1000
+        const val NOTIFICATION_ID: Int = 100
+    }
 
     override fun getPluginName() = BuildConfig.GODOT_PLUGIN_NAME
 
@@ -61,13 +71,13 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
         channelId: String,
         title: String,
         content: String,
-        smallIconPath: String,
-    ) {
-        val context = activity ?: return
+        smallIcon: String,
+    ): Int {
+        val context = activity ?: return ERROR_RETURN
 
         if (!initialized) {
-            Log.e(BuildConfig.GODOT_PLUGIN_NAME, "You must call setup first!")
-            return
+            Logger.error("You must call setup first!")
+            return ERROR_RETURN
         }
 
         Log.d(
@@ -76,38 +86,41 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
                 "Channel ID: $channelId",
                 "Title: $title",
                 "Content: $content",
-                "Icon Path: $smallIconPath"
+                "Icon: $smallIcon"
             ).joinToString(separator = " | ")
         )
 
-        val loader: ResourceLoader = ResourceLoader(context)
-
-        val smallIconBitmap: Bitmap = loader.loadImage(smallIconPath) ?: return
-        Log.d(BuildConfig.GODOT_PLUGIN_NAME, "Bitmap: $smallIconBitmap")
-
+        val loader = ResourceLoader(context)
+        val smallIconBitmap: Bitmap = loader.loadImage(smallIcon) ?: return ERROR_RETURN
         val smallIcon: IconCompat = IconCompat.createWithBitmap(smallIconBitmap)
-        Log.d(BuildConfig.GODOT_PLUGIN_NAME, "Icon: $smallIcon")
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(smallIcon)
             .setContentTitle(title)
             .setContentText(content)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
 
-        with(NotificationManagerCompat.from(context)) {
-            Log.d(BuildConfig.GODOT_PLUGIN_NAME, "NotificationManagerCompat obtained")
-
-            if (ActivityCompat.checkSelfPermission(
+        return with(NotificationManagerCompat.from(context)) {
+            // Just for En Android 13+.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val permissionStatus = ActivityCompat.checkSelfPermission(
                     context,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                Log.e(BuildConfig.GODOT_PLUGIN_NAME, "POST_NOTIFICATIONS permission not granted")
-                return@with
+                    Manifest.permission.POST_NOTIFICATIONS,
+                )
+                if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                    Logger.error("POST_NOTIFICATIONS permission not granted!")
+                    return@with ERROR_RETURN
+                }
             }
 
-            notify(100, builder.build())
-            Log.d(BuildConfig.GODOT_PLUGIN_NAME, "Notification sent with ID 100")
+            val notificationId = NOTIFICATION_ID
+            notify(notificationId, builder.build())
+            Logger.debug("Notification sent with ID $notificationId")
+
+            // Returns notificationId to godot.
+            notificationId
         }
     }
 }
