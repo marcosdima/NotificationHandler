@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.util.Log
+import org.godotengine.plugin.android.notifications.utils.Logger
 import org.json.JSONObject
 
 class ChannelHandler(val context: Context) {
@@ -20,11 +21,14 @@ class ChannelHandler(val context: Context) {
     fun createChannel(
         channelId: String,
         name: String,
-        description: String,
+        descriptionContent: String,
         importance: Importance = Importance.DEFAULT,
     ) {
-        val mChannel = NotificationChannel(channelId, name, importance.value)
-        mChannel.description = description
+        val mChannel = NotificationChannel(channelId, name, importance.value).apply {
+            description = descriptionContent
+            enableLights(true)
+            enableVibration(true)
+        }
         val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(mChannel)
     }
