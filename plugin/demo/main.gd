@@ -1,11 +1,17 @@
 extends Control
 
+const BASE = {
+	 "title": "Hello",
+	 "content": "This is a test notification",
+	 "smallIcon": "small_icon.png",
+}
+
 @export var icon: Texture2D
 @onready var scroll: ScrollContainer = $ScrollContainer
 
 var _plugin_name = "NotificationHandler"
 var _channel_id = "news_channel"
-var _small_icon = "small_icon.png"
+var _small_icon = BASE["smallIcon"]
 var _android_plugin
 
 func _ready():
@@ -39,6 +45,11 @@ func _on_hello_pressed() -> void:
 		_android_plugin.echo("Hello World!")
 
 
+func _on_permissions_pressed() -> void:
+	if _android_plugin:
+		_android_plugin.requestPostNotificationsPermissions()
+
+
 func _on_build_pressed() -> void:
 	if _android_plugin:
 		var channel_data = {
@@ -53,20 +64,38 @@ func _on_build_pressed() -> void:
 
 func _on_simple_pressed() -> void:
 	if _android_plugin:
-		var title = "Hello"
-		var content = "This is a test notification"
-		var res = _android_plugin.triggerNotification(
-			_channel_id,
-			title,
-			content,
-			_small_icon
-		)
-		print("Result: ", res)
+		var data = JSON.stringify(BASE)
+		var res = _android_plugin.triggerNotification(_channel_id, data)
+		print("Res: ", res)
 
 
-func _on_permissions_pressed() -> void:
+func _on_image_pressed() -> void:
 	if _android_plugin:
-		_android_plugin.requestPostNotificationsPermissions()
+		var aux = { "image": _small_icon }.merged(BASE)
+		var data = JSON.stringify(aux)
+		
+		var res = _android_plugin.triggerNotification(_channel_id, data)
+		print("Res: ", res)
+
+
+func _on_list_pressed() -> void:
+	if _android_plugin:
+		var aux = { "lines": ["Line 1", "Line 2", "Line 3"] }.merged(BASE)
+		var data = JSON.stringify(aux)
+		
+		var res = _android_plugin.triggerNotification(_channel_id, data)
+		print("Res: ", res)
+
+
+func _on_big_pressed() -> void:
+	if _android_plugin:
+		var aux = {
+			"bigText": "This should be a big text presentation. With title and description. Wow! What! Where! Who! Que!" 
+		}.merged(BASE)
+		var data = JSON.stringify(aux)
+		
+		var res = _android_plugin.triggerNotification(_channel_id, data)
+		print("Res: ", res)
 
 
 func _on_exit_pressed() -> void:

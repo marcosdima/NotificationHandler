@@ -14,12 +14,13 @@ import androidx.core.app.NotificationManagerCompat
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.UsedByGodot
-import org.godotengine.plugin.android.notifications.types.data.NotificationData
+import org.godotengine.plugin.android.notifications.types.Notification
+import org.godotengine.plugin.android.notifications.types.NotificationData
 import org.godotengine.plugin.android.notifications.utils.Logger
 
 class NotificationHandler(godot: Godot): GodotPlugin(godot) {
     private var initialized: Boolean = false
-    private val adapter = NotificationData.getMoshiBuilder().build().adapter(NotificationData::class.java)
+    private val adapter = Notification.getMoshiBuilder().build().adapter(NotificationData::class.java)
 
     companion object {
         const val ERROR_RETURN: Int = -1 // TODO: Error enum.
@@ -71,16 +72,24 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
         channelId: String,
         notificationData: String
     ): Int {
-        // If activity is null, do nothing
+        Logger.debug("Params: $channelId $notificationData")
+
+        // If activity is null, do nothing.
         val context = activity ?: return ERROR_RETURN
 
+        // Ask if setup was called.
         if (!wasInit()) return ERROR_RETURN
 
-        Logger.debug("params: $channelId $notificationData")
-        val notification = adapter.fromJson(notificationData) ?: return ERROR_RETURN
+        val notification = try {
+             adapter.fromJson(notificationData) ?: return ERROR_RETURN
+        } catch (e: Exception) {
+            Logger.error("E: $e")
+            return ERROR_RETURN
+        }
+
         Logger.debug("Data: $notification")
 
-        val builder = notification.getBuilder(context, channelId) ?: return ERROR_RETURN
+        val builder = Notification.getBuilder(context, channelId, data=notification) ?: return ERROR_RETURN
 
         return with(NotificationManagerCompat.from(context)) {
             // Just for En Android 13+.
@@ -102,6 +111,19 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
             // Returns notificationId to godot.
             notificationId
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @UsedByGodot
+    fun requestPostNotificationsPermissions(): Int {
+        if (!wasInit()) return ERROR_RETURN
+        val context = activity ?: return ERROR_RETURN
+        ActivityCompat.requestPermissions(
+            context,
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            REQUEST_CODE_NOTIFICATIONS
+        )
+        return 0
     }
 
     private fun wasInit(): Boolean {

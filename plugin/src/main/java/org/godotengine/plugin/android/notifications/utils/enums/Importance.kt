@@ -1,4 +1,4 @@
-package org.godotengine.plugin.android.notifications.utils
+package org.godotengine.plugin.android.notifications.utils.enums
 
 import android.app.NotificationManager
 

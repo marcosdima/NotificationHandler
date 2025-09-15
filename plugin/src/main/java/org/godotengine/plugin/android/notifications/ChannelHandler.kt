@@ -1,6 +1,6 @@
 package org.godotengine.plugin.android.notifications
 
-import org.godotengine.plugin.android.notifications.utils.Importance
+import org.godotengine.plugin.android.notifications.utils.enums.Importance
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
