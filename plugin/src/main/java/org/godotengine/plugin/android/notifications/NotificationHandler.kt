@@ -5,27 +5,24 @@ import android.util.Log
 import org.json.JSONArray
 import android.widget.Toast
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.RequiresApi
 
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.graphics.drawable.IconCompat
 
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.UsedByGodot
+import org.godotengine.plugin.android.notifications.types.data.NotificationData
 import org.godotengine.plugin.android.notifications.utils.Logger
-import org.godotengine.plugin.android.notifications.utils.ResourceLoader
-
 
 class NotificationHandler(godot: Godot): GodotPlugin(godot) {
     private var initialized: Boolean = false
+    private val adapter = NotificationData.getMoshiBuilder().build().adapter(NotificationData::class.java)
 
     companion object {
-        const val ERROR_RETURN: Int = -1
+        const val ERROR_RETURN: Int = -1 // TODO: Error enum.
         const val REQUEST_CODE_NOTIFICATIONS: Int = 1000
         const val NOTIFICATION_ID: Int = 100
     }
@@ -43,9 +40,9 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
     @UsedByGodot
     fun setup(
         channelsJson: String,
-    ) {
+    ): Int {
         // If activity is null, do nothing
-        val context = activity ?: return
+        val context = activity ?: return ERROR_RETURN
 
         // Set initialized flag.
         this.initialized = true
@@ -60,47 +57,30 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
                 channelHandler.createChannelFromJson(ch)
             }
 
-            Log.d(BuildConfig.GODOT_PLUGIN_NAME, "Setup completed!")
+            Logger.debug("Setup completed!")
         } catch (e: Exception) {
-            Log.e(BuildConfig.GODOT_PLUGIN_NAME, "Invalid JSON: $channelsJson", e)
+            Logger.error("Invalid JSON: $channelsJson \n Error: $e")
+            return ERROR_RETURN
         }
+
+        return 0
     }
 
     @UsedByGodot
     fun triggerNotification(
         channelId: String,
-        title: String,
-        content: String,
-        smallIcon: String,
+        notificationData: String
     ): Int {
+        // If activity is null, do nothing
         val context = activity ?: return ERROR_RETURN
 
-        if (!initialized) {
-            Logger.error("You must call setup first!")
-            return ERROR_RETURN
-        }
+        if (!wasInit()) return ERROR_RETURN
 
-        Log.d(
-            BuildConfig.GODOT_PLUGIN_NAME,
-            listOf(
-                "Channel ID: $channelId",
-                "Title: $title",
-                "Content: $content",
-                "Icon: $smallIcon"
-            ).joinToString(separator = " | ")
-        )
+        Logger.debug("params: $channelId $notificationData")
+        val notification = adapter.fromJson(notificationData) ?: return ERROR_RETURN
+        Logger.debug("Data: $notification")
 
-        val loader = ResourceLoader(context)
-        val smallIconBitmap: Bitmap = loader.loadImage(smallIcon) ?: return ERROR_RETURN
-        val smallIcon: IconCompat = IconCompat.createWithBitmap(smallIconBitmap)
-
-        val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(smallIcon)
-            .setContentTitle(title)
-            .setContentText(content)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
+        val builder = notification.getBuilder(context, channelId) ?: return ERROR_RETURN
 
         return with(NotificationManagerCompat.from(context)) {
             // Just for En Android 13+.
@@ -122,5 +102,12 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
             // Returns notificationId to godot.
             notificationId
         }
+    }
+
+    private fun wasInit(): Boolean {
+        if (!initialized) {
+            Logger.error("You must call setup first!")
+        }
+        return initialized
     }
 }
