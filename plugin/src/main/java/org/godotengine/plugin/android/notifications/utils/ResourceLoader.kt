@@ -5,12 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.io.File
 
-class ResourceLoader(val context: Context) {
+object ResourceLoader {
     /**
      * Load an image from godot assets. (SVG files aren't supported)
      * @param imageName
      */
-    fun loadImage(imageName: String): Bitmap? {
+    fun loadImage(context: Context, imageName: String): Bitmap? {
         val baseDir = context.filesDir.absolutePath
         val imageFile = File(baseDir, imageName)
 
