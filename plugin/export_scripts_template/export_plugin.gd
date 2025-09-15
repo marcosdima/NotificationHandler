@@ -32,11 +32,17 @@ class AndroidExportPlugin extends EditorExportPlugin:
 			return PackedStringArray([_plugin_name + "/bin/release/" + _plugin_name + "-release.aar"])
 
 	func _get_android_dependencies(platform, debug):
-		# TODO: Add remote dependices here.
+		# TODO: Add remote dependencies here.
+		var deps = [
+			'com.squareup.moshi:moshi:1.15.2',
+			'com.squareup.moshi:moshi-kotlin:1.15.2',
+			'com.squareup.moshi:moshi-adapters:1.15.2'
+		]
 		if debug:
-			return PackedStringArray([])
+			return PackedStringArray(deps)
 		else:
-			return PackedStringArray([])
+			return PackedStringArray(deps)
+
 
 	func _get_name():
 		return _plugin_name

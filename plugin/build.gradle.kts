@@ -13,7 +13,7 @@ val pluginPackageName = "org.godotengine.plugin.android.notifications"
 
 android {
     namespace = pluginPackageName
-    compileSdk = 33
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -32,14 +32,21 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
 dependencies {
     implementation("org.godotengine:godot:4.3.0.stable")
     implementation("androidx.core:core:1.17.0")
+    implementation("com.squareup.moshi:moshi:1.15.2")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+    implementation("com.squareup.moshi:moshi-adapters:1.15.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.2.20")
     // TODO: Additional dependencies should be added to export_plugin.gd as well.
 }
 
