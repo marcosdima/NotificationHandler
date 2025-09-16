@@ -129,6 +129,32 @@ theme_override_font_sizes/font_size = 30
 text = "List
 "
 
+[node name="Fourth2" type="MarginContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/Fourth2"]
+layout_mode = 2
+alignment = 1
+
+[node name="TenSeconds" type="Button" parent="ScrollContainer/VBoxContainer/Fourth2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "10 secs"
+
+[node name="List" type="Button" parent="ScrollContainer/VBoxContainer/Fourth2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "List
+"
+
 [node name="Last" type="MarginContainer" parent="ScrollContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -150,4 +176,6 @@ text = "Exit"
 [connection signal="pressed" from="ScrollContainer/VBoxContainer/Third/HBoxContainer/Image" to="." method="_on_image_pressed"]
 [connection signal="pressed" from="ScrollContainer/VBoxContainer/Fourth/HBoxContainer/Big" to="." method="_on_big_pressed"]
 [connection signal="pressed" from="ScrollContainer/VBoxContainer/Fourth/HBoxContainer/List" to="." method="_on_list_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/Fourth2/HBoxContainer/TenSeconds" to="." method="_on_ten_seconds_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/Fourth2/HBoxContainer/List" to="." method="_on_list_pressed"]
 [connection signal="pressed" from="ScrollContainer/VBoxContainer/Last/Exit" to="." method="_on_exit_pressed"]

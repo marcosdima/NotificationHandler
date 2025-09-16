@@ -65,7 +65,7 @@ func _on_build_pressed() -> void:
 func _on_simple_pressed() -> void:
 	if _android_plugin:
 		var data = JSON.stringify(BASE)
-		var res = _android_plugin.triggerNotification(_channel_id, data)
+		var res = _android_plugin.triggerNotification(_channel_id, data, 0)
 		print("Res: ", res)
 
 
@@ -74,7 +74,7 @@ func _on_image_pressed() -> void:
 		var aux = { "image": _small_icon }.merged(BASE)
 		var data = JSON.stringify(aux)
 		
-		var res = _android_plugin.triggerNotification(_channel_id, data)
+		var res = _android_plugin.triggerNotification(_channel_id, data, 0)
 		print("Res: ", res)
 
 
@@ -83,7 +83,7 @@ func _on_list_pressed() -> void:
 		var aux = { "lines": ["Line 1", "Line 2", "Line 3"] }.merged(BASE)
 		var data = JSON.stringify(aux)
 		
-		var res = _android_plugin.triggerNotification(_channel_id, data)
+		var res = _android_plugin.triggerNotification(_channel_id, data, 0)
 		print("Res: ", res)
 
 
@@ -94,9 +94,16 @@ func _on_big_pressed() -> void:
 		}.merged(BASE)
 		var data = JSON.stringify(aux)
 		
-		var res = _android_plugin.triggerNotification(_channel_id, data)
+		var res = _android_plugin.triggerNotification(_channel_id, data, 0)
 		print("Res: ", res)
 
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()
+
+
+func _on_ten_seconds_pressed() -> void:
+	if _android_plugin:
+		var data = JSON.stringify(BASE)
+		var res = _android_plugin.triggerNotification(_channel_id, data, 10)
+		print("Res: ", res)
