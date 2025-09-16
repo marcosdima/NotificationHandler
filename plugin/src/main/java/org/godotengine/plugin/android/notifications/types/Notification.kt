@@ -4,15 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.godotengine.plugin.android.notifications.utils.Logger
 import org.godotengine.plugin.android.notifications.utils.ResourceLoader
 
 object Notification {
     fun getMoshiBuilder(): Builder {
-        return Moshi.Builder().add(KotlinJsonAdapterFactory())
+        return Builder().add(KotlinJsonAdapterFactory())
     }
 
     fun getBuilder(context: Context, channelId: String, data: NotificationData): NotificationCompat.Builder? {
