@@ -1,16 +1,21 @@
 package org.godotengine.plugin.android.notifications
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.util.Log
 import org.json.JSONArray
 import android.widget.Toast
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
-
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.UsedByGodot
@@ -70,7 +75,8 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
     @UsedByGodot
     fun triggerNotification(
         channelId: String,
-        notificationData: String
+        notificationData: String,
+        seconds: Int,
     ): Int {
         Logger.debug("Params: $channelId $notificationData")
 
@@ -80,16 +86,32 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
         // Ask if setup was called.
         if (!wasInit()) return ERROR_RETURN
 
+        // Parse data.
         val notification = try {
-             adapter.fromJson(notificationData) ?: return ERROR_RETURN
+            adapter.fromJson(notificationData) ?: return ERROR_RETURN
         } catch (e: Exception) {
             Logger.error("E: $e")
             return ERROR_RETURN
         }
 
-        Logger.debug("Data: $notification")
+        // Set timer if seconds is higher than 0.
+        if (seconds > 0) {
+            this.setTimer(
+                seconds.toLong(),
+            ) { this.activateNotification(context,channelId, notification) }
+            return 1
+        }
 
-        val builder = Notification.getBuilder(context, channelId, data=notification) ?: return ERROR_RETURN
+        // Set notification.
+        return this.activateNotification(context, channelId, notification)
+    }
+
+    fun activateNotification(
+        context: Context,
+        channelId: String,
+        data: NotificationData,
+    ): Int {
+        val builder = Notification.getBuilder(context, channelId, data) ?: return ERROR_RETURN
 
         return with(NotificationManagerCompat.from(context)) {
             // Just for En Android 13+.
@@ -113,23 +135,22 @@ class NotificationHandler(godot: Godot): GodotPlugin(godot) {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @UsedByGodot
-    fun requestPostNotificationsPermissions(): Int {
-        if (!wasInit()) return ERROR_RETURN
-        val context = activity ?: return ERROR_RETURN
-        ActivityCompat.requestPermissions(
-            context,
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-            REQUEST_CODE_NOTIFICATIONS
-        )
-        return 0
-    }
-
     private fun wasInit(): Boolean {
         if (!initialized) {
             Logger.error("You must call setup first!")
         }
         return initialized
     }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun setTimer(
+            seconds: Long,
+            function: () ->  Int
+        ) {
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(seconds * 1000L)
+            function()
+        }
+    }
+
 }
