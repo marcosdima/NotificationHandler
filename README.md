@@ -16,5 +16,5 @@ The plugin allows you to:
 
 ## Use
 
-Go to this repository to learn how to use it: [AndroidNotificationPlugin](https://godotengine.org)
+Visit this repository for instructions on how to install and use the plugin → [AndroidNotificationPlugin](https://github.com/marcosdima/AndroidNotificationPlugin.git)
 
